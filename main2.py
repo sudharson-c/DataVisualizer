@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Step 1: Classify Data Types
+# Classify Data Types
 def classify_columns(df, cat_threshold=0.1, text_length_threshold=50):
     numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
     categorical_cols = []
@@ -33,7 +33,7 @@ def classify_columns(df, cat_threshold=0.1, text_length_threshold=50):
 
     return numerical_cols, categorical_cols, text_cols, boolean_cols, sparse_cols
 
-# Step 2: Missing Value Analysis
+# Missing Value Analysis
 def analyze_missing_values(df):
     missing_counts = df.isna().sum()
     total_rows = len(df)
@@ -41,7 +41,7 @@ def analyze_missing_values(df):
                     for col, count in missing_counts.items() if count > 0]
     return missing_info
 
-# Step 3: Data Insights (Distribution, Redundancy, Outliers)
+# Data Insights (Distribution, Redundancy, Outliers)
 def analyze_data_insights(df, corr_threshold=0.95):
     numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
     insights = {}
@@ -83,7 +83,7 @@ def analyze_data_insights(df, corr_threshold=0.95):
 
     return insights
 
-# Step 4: Generate Summary
+# Generate Summary
 def generate_summary(df, num_cols, cat_cols, text_cols, bool_cols, sparse_cols, missing_info, insights):
     total_cols = df.shape[1]
     missing_cols = len(missing_info)
@@ -119,12 +119,11 @@ def generate_summary(df, num_cols, cat_cols, text_cols, bool_cols, sparse_cols, 
 
     return summary
 
-# Streamlit UI
+
 st.set_page_config(page_title="Data Profiler", layout="wide")
 st.title("📊 Data Profiler")
 st.markdown("Upload your dataset to explore its structure, spot issues, and get analysis tips!")
 
-# Sidebar for Settings
 with st.sidebar:
     st.header("⚙️ Settings")
     cat_threshold = st.slider("Categorical Threshold", 0.05, 0.5, 0.1, help="Lower values = stricter categorical detection")
@@ -132,7 +131,7 @@ with st.sidebar:
     plot_style = st.selectbox("Plot Style", ["Histogram", "Box Plot", "Both"], help="Choose how to visualize numerical data")
     bins = st.slider("Histogram Bins", 10, 50, 20, help="Number of bars in histograms")
 
-# Main Content
+
 uploaded_file = st.file_uploader("📂 Upload Your Dataset (CSV, Excel, JSON)", type=["csv", "xlsx", "json"])
 
 if uploaded_file:
@@ -144,7 +143,6 @@ if uploaded_file:
         else:
             df = pd.read_json(uploaded_file)
 
-        # Tabs for Organization
         tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Missing Data", "Data Insights", "Summary"])
 
         with tab1:
@@ -161,8 +159,6 @@ if uploaded_file:
                 st.write(f"✅ Boolean: {', '.join(bool_cols) or 'None'}")
                 st.write(f"⚠ Sparse: {', '.join(sparse_cols) or 'None'}")
             st.write(df.describe())
-            info = pd.DataFrame(df.info())
-            st.write(info)
             
 
             st.info("**What this means:** Numerical columns have numbers, categorical have few unique values, text is longer strings, boolean is yes/no, and sparse is mostly empty.")
@@ -224,7 +220,6 @@ if uploaded_file:
             st.markdown(summary)
             st.download_button("📥 Download Report", summary, "data_profile_report.txt", help="Save this summary as a text file")
 
-        # Export Cleaned Data Option
         st.subheader("Export Cleaned Data")
         cleaned_df = df.drop(columns=sparse_cols + insights["redundant_cols"])
         csv = cleaned_df.to_csv(index=False)
